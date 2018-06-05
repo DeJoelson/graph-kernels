@@ -4,12 +4,14 @@ Created on Jun 4, 2018
 @author: Sam
 '''
 import matplotlib.pyplot as plt
+import datetime as datetime
+from constants import OUTPUT_DIR
 from mpl_toolkits.mplot3d import Axes3D
 
 
 class PredictorsPlot:
 
-    def __init__(self, filename):
+    def __init__(self, filename=OUTPUT_DIR+datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")):
 
         self._filename = filename
         self._fig = plt.figure()
@@ -31,8 +33,8 @@ class PredictorsPlot:
         """Assumes the category responses are either of the form (A, B, C,...) or (0, 1, 2...)"""
         self._ax.scatter(x, y, z, c=self._colors[category], marker=marker)
 
-    def imshow(self):
-        plt.imshow(self._fig)
+    def show(self):
+        plt.show()
 
     def __enter__(self):
         # Method in place for the WITH keyword
