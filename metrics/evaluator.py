@@ -40,8 +40,6 @@ class Evaluator(object):
             schwartz_classifier = SchwartzClassifier(classifer)
             cvout = self._cross_validate_individual_classifier(schwartz_classifier, test_size_ratio)
 
-            print("Output: ", cvout)
-
             self._write_file_line(file_name, predictor_set_name, classifer_name, self._number_of_total_observations, test_size_ratio, cvout)
 
     def _write_file_line(self, file_name, predictor_set_name, method, total_observations, test_size_ratio, cvout):
