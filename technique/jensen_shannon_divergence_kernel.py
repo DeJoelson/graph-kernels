@@ -14,7 +14,6 @@ def get_kernel_matrix(list_of_adj_matricies):
     index = 0
     for i in range(dim):
         adjacency_matrix1 = np.matrix(list_of_adj_matricies[i])
-        print("Computing Kernal Matrix; Percentage Complete: " + str((index * 100) / dim))
         index += 1
         for j in range(dim):
             adjacency_matrix2 = np.matrix(list_of_adj_matricies[j])
