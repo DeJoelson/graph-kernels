@@ -30,17 +30,17 @@ class Evaluator(object):
             predictor_set_name = "Predictors"
         if classifiers is None:
             number_of_training_observations = self._number_of_total_observations - int(self._number_of_total_observations * test_size_ratio)
-            classifiers = self.get_default_classifiers(number_of_training_observations)
+            classifiers, classifier_names = self.get_default_classifiers(number_of_training_observations)
 
         classifier_count = len(classifiers)
+
         for i, classifer in enumerate(classifiers):
-            classifer_name = str(type(classifer).__name__)
-            print("Working On " + classifer_name + "; #" + str(i) + " of " + str(classifier_count) + "(" + str(i * 100 / classifier_count) + "%); " + "filename: " + file_name)
+            print("Working On " + classifier_names[i] + "; #" + str(i) + " of " + str(classifier_count) + "(" + str(i * 100 / classifier_count) + "%); " + "filename: " + file_name)
 
             schwartz_classifier = SchwartzClassifier(classifer)
             cvout = self._cross_validate_individual_classifier(schwartz_classifier, test_size_ratio)
 
-            self._write_file_line(file_name, predictor_set_name, classifer_name, self._number_of_total_observations, test_size_ratio, cvout)
+            self._write_file_line(file_name, predictor_set_name, classifier_names[i], self._number_of_total_observations, test_size_ratio, cvout)
 
     def _write_file_line(self, file_name, predictor_set_name, method, total_observations, test_size_ratio, cvout):
         with open(file_name, 'a') as csvfile:
@@ -57,19 +57,26 @@ class Evaluator(object):
         X = self._all_predictor_variables
         y = self._all_response_variables
 
-        out = model_selection.cross_validate(classifier, X, y, scoring="accuracy", cv=cv_options, return_train_score='warn')
+        out = model_selection.cross_validate(classifier, X, y, scoring="accuracy", cv=cv_options, return_train_score=True, verbose=1)
         return out
 
     @staticmethod
     def get_default_classifiers(number_of_training_observations):
         sqrt_obs = int(math.sqrt(number_of_training_observations))
         classifiers = []
+        classifier_names = []
         classifiers.append(KNeighborsClassifier(1))  # k-nn, with k=1
+        classifier_names.append("1-NearestNeighbor")
         classifiers.append(KNeighborsClassifier(sqrt_obs))  # k-nn, with k=sqrt(number of training observations)
+        classifier_names.append("k-NearestNeighbors")
         classifiers.append(GaussianNB())  # Gaussian Naive Bayes
+        classifier_names.append("GaussianNaiveBayes")
         classifiers.append(SVC(kernel="linear", random_state=RANDOM_SEED))  # Support Vector Machine with Linear Kernel
+        classifier_names.append("SVM-LinearKernel")
         classifiers.append(SVC(kernel="rbf", random_state=RANDOM_SEED))  # Support Vector Machine with Radial Basis Kernel
+        classifier_names.append("SVM-RadialBasisKernel")
         classifiers.append(DecisionTreeClassifier(random_state=RANDOM_SEED))  # Single Decision Tree
+        classifier_names.append("DecisionTree")
         classifiers.append(RandomForestClassifier(n_estimators=RANDOM_FOREST_DEFAULT_TREE_COUNT, random_state=RANDOM_SEED))  # Random Forest
-
-        return classifiers
+        classifier_names.append(str(RANDOM_FOREST_DEFAULT_TREE_COUNT)+"TreeRandomForest")
+        return classifiers, classifier_names
