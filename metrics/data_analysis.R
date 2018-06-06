@@ -1,0 +1,77 @@
+###############################################
+# Helper Functions; Start Coding at ~Line 60
+###############################################
+
+get_fit_time <- function(data_frame){
+  to_return <- data.frame(data_frame$FitTime0, data_frame$FitTime1, data_frame$FitTime2, data_frame$FitTime3, data_frame$FitTime4, data_frame$FitTime5, data_frame$FitTime6, data_frame$FitTime7, data_frame$FitTime8, data_frame$FitTime9)
+  return(to_return)
+}
+get_score_time <- function(data_frame){
+  to_return <- data.frame(data_frame$ScoreTime0, data_frame$ScoreTime1, data_frame$ScoreTime2, data_frame$ScoreTime3, data_frame$ScoreTime4, data_frame$ScoreTime5, data_frame$ScoreTime6, data_frame$ScoreTime7, data_frame$ScoreTime8, data_frame$ScoreTime9)
+  return(to_return)
+}
+get_train_accuracy <- function(data_frame){
+  to_return <- data.frame(data_frame$TrainAccuracy0, data_frame$TrainAccuracy1, data_frame$TrainAccuracy2, data_frame$TrainAccuracy3, data_frame$TrainAccuracy4, data_frame$TrainAccuracy5, data_frame$TrainAccuracy6, data_frame$TrainAccuracy7, data_frame$TrainAccuracy8, data_frame$TrainAccuracy9)
+  return(to_return)
+}
+get_test_accuracy <- function(data_frame){
+  to_return <- data.frame(data_frame$TestAccuracy0, data_frame$TestAccuracy1, data_frame$TestAccuracy2, data_frame$TestAccuracy3, data_frame$TestAccuracy4, data_frame$TestAccuracy5, data_frame$TestAccuracy6, data_frame$TestAccuracy7, data_frame$TestAccuracy8, data_frame$TestAccuracy9)
+  return(to_return)
+}
+
+two_dim <- function(target_column, data_frame){
+  to_return <- data.frame(response=numeric(), predictor=numeric())
+  for(i in 1:nrow(data_frame)){
+    for(j in 1:ncol(data_frame)){
+      to_return <- rbind(to_return, c(target_column[i], data_frame[i,j]))
+    }
+  }
+  colnames(to_return)<-c("Response", "Predictor")
+  return(to_return)
+}
+
+plot_fit_time<-function(plotting_data, title){
+  d2 <- two_dim(1-plotting_data$TestingTrainingSeperationRatio, get_fit_time(plotting_data))
+  plot_lines(d2, "Ratio of Data Used To Train", "Time to Train (Seconds)", title)
+}
+
+plot_train_accuracy<-function(plotting_data, title){
+  d2 <- two_dim(1-plotting_data$TestingTrainingSeperationRatio, get_train_accuracy(plotting_data))
+  plot_lines(d2, "Ratio of Data Used To Train", "Accuracy on Training Data (%)", title, y_lims=c(0,1))
+}
+
+plot_test_accuracy<-function(plotting_data, title){
+  d2 <- two_dim(1-plotting_data$TestingTrainingSeperationRatio, get_test_accuracy(plotting_data))
+  plot_lines(d2, "Ratio of Data Used To Train", "Accuracy on Testing Data (%)", title, y_lims=c(0,1))
+}
+
+plot_lines<-function(data, xlab, ylab, title, y_lims=NULL){
+  q_mean <- aggregate(data$Predictor , by=list(data$Response), mean)
+  q_sd <- aggregate(data$Predictor , by=list(data$Response), sd)
+  if(is.null(y_lims)){
+    y_lims = c(min(q_mean$x-q_sd$x), max(q_mean$x+q_sd$x))
+  }
+  plot(q_mean$x~q_mean$Group.1, type="b" , col="red", pch=20, xlab=xlab, ylab=ylab, ylim=y_lims, main=title)
+  arrows(q_mean$Group.1, q_mean$x-q_sd$x, q_mean$Group.1, q_mean$x+q_sd$x, length=0.05, angle=90, code=3)
+
+}
+
+###############################################
+# Plot Stuff Here
+###############################################
+
+t4 <- read.csv("../output/T4-Adj.csv")
+filename <- paste('../output/plotT4AdjIso',method, sep="")
+
+plotting_data=t4[t4$Method==method,]
+
+for(method in unique(t4$Method)){
+  png(filename)
+  par(mfrow=c(1,3))
+  plot_test_accuracy(plotting_data, "")
+  plot_train_accuracy(plotting_data, "")
+  plot_fit_time(plotting_data, "")
+  title(paste("Predicting Isomorphism Class | Dataset: Adjacency Matricies of Labeled Tournaments of order 4;\n Final Data Seperation Method: ", method), outer=TRUE, line = -3)
+  #dev.print(png, ,width=900, height=400)
+  dev.off()
+}
