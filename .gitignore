@@ -10,3 +10,5 @@ __pycache__/deleteme.cpython-36.pyc
 .project
 __pycache__/
 output/
+data/T7_Lap.py
+data/T7_Adj.py
