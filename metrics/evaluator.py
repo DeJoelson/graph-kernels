@@ -42,6 +42,26 @@ class Evaluator(object):
 
             self._write_file_line(file_name, predictor_set_name, classifier_names[i], self._number_of_total_observations, test_size_ratio, cvout)
 
+    def cross_validate_to_file_number_based(self, file_name=None, predictor_set_name=None, training_observations=10, classifiers=None):
+        if file_name is None:
+            file_name = OUTPUT_DIR + datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S") + ".csv"
+        if predictor_set_name is None:
+            predictor_set_name = "Predictors"
+        if classifiers is None:
+            number_of_training_observations = training_observations
+            classifiers, classifier_names = self.get_default_classifiers(number_of_training_observations)
+
+        classifier_count = len(classifiers)
+
+        for i, classifer in enumerate(classifiers):
+            print("Working On " + classifier_names[i] + "; #" + str(i) + " of " + str(classifier_count) + "(" + str(i * 100 / classifier_count) + "%); " + "filename: " + file_name)
+
+            schwartz_classifier = SchwartzClassifier(classifer)
+            cvout = self._cross_validate_individual_classifier_number(schwartz_classifier, training_observations)
+
+            self._write_file_line(file_name, predictor_set_name, classifier_names[i], self._number_of_total_observations, training_observations, cvout)
+
+ 
     def _write_file_line(self, file_name, predictor_set_name, method, total_observations, test_size_ratio, cvout):
         with open(file_name, 'a') as csvfile:
             thewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -57,6 +77,19 @@ class Evaluator(object):
         X = self._all_predictor_variables
         y = self._all_response_variables
 
+        out = model_selection.cross_validate(classifier, X, y, scoring="accuracy", cv=cv_options, return_train_score=True, verbose=1)
+        return out
+    
+    def _cross_validate_individual_classifier_number(self, classifier, number_of_training_observations):
+        
+        X = self._all_predictor_variables
+        y = self._all_response_variables
+        
+        total_observations = len(X)
+        
+        test_size_count = total_observations - number_of_training_observations
+        
+        cv_options = model_selection.ShuffleSplit(n_splits=10, test_size=test_size_count, random_state=RANDOM_SEED)
         out = model_selection.cross_validate(classifier, X, y, scoring="accuracy", cv=cv_options, return_train_score=True, verbose=1)
         return out
 
