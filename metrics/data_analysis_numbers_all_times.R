@@ -64,7 +64,7 @@ plot_fit_time<-function(all_data){
   p <- p + geom_point(aes(x=d22$X, y=d22$Y, colour="A"), size=1)
   #p <- p + geom_smooth(aes(formula=d22$Y~poly(d22$X, 2), colour ="-"), method='lm')
   p <- p + stat_function(fun=manual_trend, aes(color="B"))
-  p <- p + labs(x=NULL, y="Time to Train\n(Seconds)",title = "Predicting Isomorphism Class - Training Times Overview", subtitle=paste("Prediction Dataset Used:", plotting_data$PredictorSet[1]), col=NULL)
+  p <- p + labs(x=NULL, y="Time to Train\n(Seconds)",title = "Predicting Isomorphism Class - Training Times Overview", subtitle=paste("Prediction Dataset Used:", all_data$PredictorSet[1]), col=NULL)
   p <- p + theme_bw() + theme(legend.position = c(0.2, 0.7),legend.title = element_blank(), legend.background = element_rect(size=0.5, linetype="solid", 
                                                                                                                               colour ="black"))
   print(p)

@@ -101,7 +101,7 @@ p2 <- plot_fit_time(plotting_data)
 
 
 method = "SVM-LinearKernel"
-t4 <- read.csv("../output/T4-Adj-Numbers.csv")
+t4 <- read.csv("../output/T5-Adj-Numbers.csv")
 
 plotting_data=t4[t4$Method==method,]
 
@@ -119,7 +119,7 @@ grid.arrange(arrangeGrob(gA,gB,nrow=2,heights=c(.666,.333)))
 
 
 for(method in unique(t4$Method)){
-  filename <- paste('../output/plotT4AdjIso',method,"-Number.pdf", sep="")
+  filename <- paste('../output/plotT5AdjIso',method,"-Number.pdf", sep="")
   plotting_data=t4[t4$Method==method,]
 
   pdf(filename, width=6, height=4 )
