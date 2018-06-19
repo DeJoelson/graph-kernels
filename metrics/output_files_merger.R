@@ -86,11 +86,41 @@ merge_files <- function(ratioCSV, numbersCSV){
   return(merged)
 }
 
-dataSet <- "T4-AdjacencyMatrix"
+plot_merged<-function(m, data_set){
+  my_shapes <- c(0,1,2,3,4,5,6)
+  total_observations <- m$TotalObservations[1]
+  p <- ggplot()
+  p <- p + geom_point(aes(x=m$PercentageOfDataUsedForTraining*100, y=m$TestDataAccuracyMean*100, colour=m$Method, shape=m$Method), size=2)
+  p <- p + labs(x="Percentage Of Data Used For Training", y="10-Fold Validation:\nMean Accuracy (%)", title = data_set)
+  p <- p + scale_x_continuous(sec.axis =dup_axis(trans = ~.*total_observations/100, name = "Number Of Observations Used For Training", breaks = derive(), labels = derive()))
+  p <- p + ylim(0, 100)
+  p <- p + scale_shape_manual(values=my_shapes)
+  p <- p +theme_bw() 
+  return(p)
+}
+
+save_plot <- function(myPlot, filename) {
+  pdf(filename)
+  print(myPlot)
+  dev.off()
+}
+
+
+dataSet <- "T4-AdjacencyMatrix-FAST"
 
 ratioData <- read.csv(paste(dataSet, "-Ratio.csv", sep=""))
 numberData <- read.csv(paste(dataSet, "-Numbers.csv", sep=""))
 
-m <- m <- merge_files(ratioData, numberData)
+m <- merge_files(ratioData, numberData)
 
-plot(m$PercentageOfDataUsedForTraining, m$TestDataAccuracyMean, col=m$Method, pch=16, main=dataSet)
+
+
+p <- plot_merged(m, dataSet)
+
+#C:/Users/Sam/Desktop/Research/graph-kernels/output/
+out_filename <- paste("",dataSet, ".pdf", sep = "")
+
+print(p)
+#save_plot(p, out_filename)
+
+
