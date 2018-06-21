@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def get_T4_Lap():
+def get_T4_Lap_FAST():
     data = [
             ["AA", np.matrix([[0, 0, 0, 0], [1, 1, 0, 0], [1, 1, 3, 1], [1, 1, 0, 2]])],
             ["AA", np.matrix([[0, 0, 0, 0], [1, 2, 1, 0], [1, 0, 1, 0], [1, 1, 1, 3]])],
